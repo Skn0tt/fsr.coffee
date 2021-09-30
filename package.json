@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build": "parcel index.html"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.0.0-rc.0",
+    "parcel": "^2.0.0-rc.0"
+  },
+  "dependencies": {
+    "water.css": "^2.1.1"
+  }
+}

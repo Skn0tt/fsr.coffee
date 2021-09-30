@@ -1,0 +1,14 @@
+#drinklist {
+  list-style-type: none;
+  padding: 0px;
+
+  li {
+    height: 50px;
+    line-height: 50px;
+
+    button {
+      float: right;
+      width: 100px;
+    }
+  }
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fsr.coffee</title>
+  <link rel="stylesheet" href="./node_modules/water.css/out/water.css">
+  <link rel="stylesheet" href="./index.scss">
+</head>
+
+<body>
+  <h1>fsr.coffee</h1>
+
+  <section>
+    <ul id="drinklist">
+      <li id="cappucino" data-cents="30">
+        Cappucino (30ct)
+        <button>
+          ☕️
+        </button>
+      </li>
+
+      <li id="latte_macchiato" data-cents="40">
+        Latte Macchiato (40ct)
+        <button>
+          ☕️
+        </button>
+      </li>
+    </ul>
+  </section>
+
+  <section style="margin-top: 20px; height: 40px;">
+    <span style="float: right;">
+      Total: <strong id="total" style="padding-right: 20px;" data-minimum="300">0€</strong>
+      <button id="pay">Pay</button>
+    </span>
+  </section>
+
+  <script src="./index.ts" type="module"></script>
+</body>
+
+</html>
