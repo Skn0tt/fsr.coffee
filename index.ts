@@ -55,7 +55,9 @@ function writeTotal() {
 Cart.onChange(writeTotal);
 writeTotal();
 
-document.getElementById("pay").onclick = () => {
+document.getElementById("pay").onclick = async () => {
   const total = Cart.computeTotal(prices);
-  alert(`I'll make you pay ${formatEuro(total)}!`);
+
+  const stripe = await import("./stripe");
+  await stripe.pay(total);
 };
