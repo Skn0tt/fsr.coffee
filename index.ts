@@ -61,9 +61,14 @@ payButton.onclick = async () => {
   const total = Cart.computeTotal(prices);
 
   payButton.disabled = true;
+  payButton.textContent = "...";
+
   const stripe = await import("./stripe");
   const result = await stripe.pay(total);
+
   payButton.disabled = false;
+  payButton.textContent = "Pay";
+
   if (result === "paid") {
     Cart.reset();
   } else if (result === "payment_failed") {
