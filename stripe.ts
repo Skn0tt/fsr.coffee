@@ -35,6 +35,8 @@ export async function pay(totalCents: number) {
 
   return await new Promise<"paid" | "payment_failed">((resolve) => {
     paymentRequest.on("paymentmethod", async (event) => {
+      prButton.unmount();
+
       const results = await stripe.confirmCardPayment(
         clientSecret,
         { payment_method: event.paymentMethod.id },
