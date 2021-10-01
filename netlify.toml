@@ -1,5 +1,5 @@
 [build]
-  command = "parcel build index.html && mkdir dist/.well-known && echo $APPLE_DEVELOPER_MERCHANTID_DOMAIN_ASSOCIATION > dist/.well-known/apple-developer-merchantid-domain-association"
+  command = "parcel build index.html && cp -r .well-known dist"
 
 [dev]
   command = "parcel index.html"
