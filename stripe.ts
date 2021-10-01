@@ -23,7 +23,8 @@ export async function pay(totalCents: number) {
   const prButton = elements.create("paymentRequestButton", {
     paymentRequest,
   });
-  prButton.mount("#pay");
+
+  prButton.mount("#paymentRequest");
 
   const res = await fetch("/.netlify/functions/createPaymentIntent", {
     method: "POST",
