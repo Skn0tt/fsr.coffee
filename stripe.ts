@@ -26,6 +26,7 @@ export async function pay(totalCents: number) {
   prButton.mount("#pay");
 
   const res = await fetch("/.netlify/functions/createPaymentIntent", {
+    method: "POST",
     body: JSON.stringify({ amount: totalCents }),
     headers: { "Content-Type": "application/json" },
   });
