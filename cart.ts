@@ -41,3 +41,8 @@ export function computeTotal(pricing: Record<string, number>): number {
   });
   return sum(lineItems);
 }
+
+export function reset() {
+  localStorage.clear();
+  emitChange();
+}

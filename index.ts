@@ -33,13 +33,14 @@ for (const drinkEl of drinkEls) {
 
   const incrementButtonEl = drinkEl.querySelector("button");
 
-  const quantity = Cart.getQuantity(drinkId);
-  incrementButtonEl.textContent = formatQuantity(quantity);
+  incrementButtonEl.onclick = () => Cart.buy(drinkId);
 
-  incrementButtonEl.onclick = () => {
-    const newQuantity = Cart.buy(drinkId);
-    incrementButtonEl.textContent = formatQuantity(newQuantity);
-  };
+  function writeQuantity() {
+    incrementButtonEl.textContent = formatQuantity(Cart.getQuantity(drinkId));
+  }
+
+  Cart.onChange(writeQuantity);
+  writeQuantity();
 }
 
 function writeTotal() {
@@ -59,5 +60,12 @@ document.getElementById("pay").onclick = async () => {
   const total = Cart.computeTotal(prices);
 
   const stripe = await import("./stripe");
-  await stripe.pay(total);
+  const result = await stripe.pay(total);
+  if (result === "paid") {
+    Cart.reset();
+  } else if (result === "payment_failed") {
+    alert("payment failed - use cash instead");
+  } else if (result === "payment_impossible") {
+    alert("payment unsupported - use cash instead");
+  }
 };

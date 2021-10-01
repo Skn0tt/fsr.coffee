@@ -15,8 +15,7 @@ export async function pay(totalCents: number) {
   });
 
   if (!(await paymentRequest.canMakePayment())) {
-    alert("Couldn't make payment - use cash instead.");
-    return;
+    return "payment_impossible";
   }
 
   const elements = stripe.elements();
@@ -34,26 +33,31 @@ export async function pay(totalCents: number) {
 
   const { clientSecret } = await res.json();
 
-  paymentRequest.on("paymentmethod", async (event) => {
-    const results = await stripe.confirmCardPayment(
-      clientSecret,
-      { payment_method: event.paymentMethod.id },
-      { handleActions: false }
-    );
+  return await new Promise<"paid" | "payment_failed">((resolve) => {
+    paymentRequest.on("paymentmethod", async (event) => {
+      const results = await stripe.confirmCardPayment(
+        clientSecret,
+        { payment_method: event.paymentMethod.id },
+        { handleActions: false }
+      );
 
-    if (results.error) {
-      event.complete("fail");
-    } else {
-      event.complete("success");
+      if (results.error) {
+        event.complete("fail");
+        return resolve("payment_failed");
+      } else {
+        event.complete("success");
 
-      if (results.paymentIntent.status === "requires_action") {
-        const result2 = await stripe.confirmCardPayment(clientSecret);
+        if (results.paymentIntent.status === "requires_action") {
+          const result2 = await stripe.confirmCardPayment(clientSecret);
 
-        if (result2.error) {
-          alert("payment failed - use cash instead.");
-          return;
+          if (result2.error) {
+            alert("payment failed - use cash instead.");
+            return resolve("payment_failed");
+          }
         }
       }
-    }
+
+      resolve("paid");
+    });
   });
 }
