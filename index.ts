@@ -56,11 +56,14 @@ function writeTotal() {
 Cart.onChange(writeTotal);
 writeTotal();
 
-document.getElementById("pay").onclick = async () => {
+const payButton = document.getElementById("pay") as HTMLButtonElement;
+payButton.onclick = async () => {
   const total = Cart.computeTotal(prices);
 
+  payButton.disabled = true;
   const stripe = await import("./stripe");
   const result = await stripe.pay(total);
+  payButton.disabled = false;
   if (result === "paid") {
     Cart.reset();
   } else if (result === "payment_failed") {
