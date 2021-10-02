@@ -63,17 +63,26 @@ payButton.onclick = async () => {
   payButton.disabled = true;
   payButton.textContent = "...";
 
-  const stripe = await import("./stripe");
-  const result = await stripe.pay(total);
+  const integrations = await Promise.all([
+    import("./paypal"),
+    import("./stripe"),
+  ]);
 
-  payButton.disabled = false;
-  payButton.textContent = "Pay";
+  const runningPaymentOptions: { close(): void }[] = [];
 
-  if (result === "paid") {
-    Cart.reset();
-  } else if (result === "payment_failed") {
-    alert("payment failed - use cash instead");
-  } else if (result === "payment_impossible") {
-    alert("payment unsupported - use cash instead");
-  }
+  await Promise.all(
+    integrations.map(async (paymentIntegration) => {
+      const runningPayment = await paymentIntegration.pay(total, () => {
+        payButton.disabled = false;
+        payButton.textContent = "Pay";
+        Cart.reset();
+
+        runningPaymentOptions.forEach((option) => option.close());
+      });
+
+      if (runningPayment) {
+        runningPaymentOptions.push(runningPayment);
+      }
+    })
+  );
 };

@@ -1,6 +1,6 @@
 import { loadStripe } from "@stripe/stripe-js";
 
-export async function pay(totalCents: number) {
+export async function pay(totalCents: number, onPaid: () => void) {
   const stripe = await loadStripe(process.env.STRIPE_PUBLISHABLE_KEY);
 
   const paymentRequest = stripe.paymentRequest({
@@ -15,7 +15,7 @@ export async function pay(totalCents: number) {
   });
 
   if (!(await paymentRequest.canMakePayment())) {
-    return "payment_impossible";
+    return null;
   }
 
   const elements = stripe.elements();
@@ -23,7 +23,7 @@ export async function pay(totalCents: number) {
     paymentRequest,
   });
 
-  prButton.mount("#paymentRequest");
+  prButton.mount("#stripeRequest");
 
   const res = await fetch("/.netlify/functions/createPaymentIntent", {
     method: "POST",
@@ -33,33 +33,37 @@ export async function pay(totalCents: number) {
 
   const { clientSecret } = await res.json();
 
-  return await new Promise<"paid" | "payment_failed">((resolve) => {
-    paymentRequest.on("paymentmethod", async (event) => {
-      const results = await stripe.confirmCardPayment(
-        clientSecret,
-        { payment_method: event.paymentMethod.id },
-        { handleActions: false }
-      );
+  paymentRequest.on("paymentmethod", async (event) => {
+    const results = await stripe.confirmCardPayment(
+      clientSecret,
+      { payment_method: event.paymentMethod.id },
+      { handleActions: false }
+    );
 
-      prButton.unmount();
+    prButton.unmount();
 
-      if (results.error) {
-        event.complete("fail");
-        return resolve("payment_failed");
-      } else {
-        event.complete("success");
+    if (results.error) {
+      event.complete("fail");
+      return;
+    } else {
+      event.complete("success");
 
-        if (results.paymentIntent.status === "requires_action") {
-          const result2 = await stripe.confirmCardPayment(clientSecret);
+      if (results.paymentIntent.status === "requires_action") {
+        const result2 = await stripe.confirmCardPayment(clientSecret);
 
-          if (result2.error) {
-            alert("payment failed - use cash instead.");
-            return resolve("payment_failed");
-          }
+        if (result2.error) {
+          alert("payment failed - use cash instead.");
+          return;
         }
       }
+    }
 
-      resolve("paid");
-    });
+    onPaid();
   });
+
+  return {
+    close() {
+      prButton.unmount();
+    },
+  };
 }

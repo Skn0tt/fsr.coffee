@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@netlify/functions": "^0.7.2",
+    "@paypal/paypal-js": "^4.0.12",
     "@stripe/stripe-js": "^1.18.0",
     "stripe": "^8.178.0",
     "water.css": "^2.1.1"
